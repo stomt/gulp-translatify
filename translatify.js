@@ -1,5 +1,5 @@
 var u = require('underscore'),
-    fs = require("fs"),
+    fs = require('fs'),
     walk = require('fs-walk'),
     path = require('path');
 
