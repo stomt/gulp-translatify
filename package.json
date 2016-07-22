@@ -1,0 +1,27 @@
+{
+  "name": "gulp-translatify",
+  "version": "1.0.0",
+  "description": "Replaces long descriptive translation variables with shortcodes",
+  "main": "index.js",
+  "scripts": {
+    "test": "translatify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "gulp-translatify"
+  },
+  "keywords": [
+    "gulp",
+    "translation",
+    "variables",
+    "uglify",
+    "minify",
+    "reduce",
+    "filesize"
+  ],
+  "author": "Philipp Zentner",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  }
+}
