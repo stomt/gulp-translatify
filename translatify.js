@@ -24,14 +24,16 @@ var supportedExtensions = [
     '.map'
 ];
 
-translatify(translationsFiles, pathsToOptimize, supportedExtension);
+translatify(translationsFiles, pathsToOptimize, supportedExtensions);
 
 function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
 
-    var notReplaced = [], // translation variables that haven't been replaced
-        replaced = [], // translation variables that have been replaced
+    var notReplaced = [],   // translation variables that haven't been replaced
+        replaced = [],      // translation variables that have been replaced
         variables = getVariablesFromTranslationFiles(translationsFiles),
-        variableShorthandCombinations = generateShorthands(variables);// Generate shorthands combinations
+        variableShorthandCombinations = generateShorthands(variables);      // Generate shorthands combinations
+
+    //console.log(variableShorthandCombinations);
 
     // Walk through files and replace old translation-variables with new onces
     u.each(pathsToOptimize, function(optimizePath, variableShorthandCombinations){
@@ -60,11 +62,11 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
 
     /**
      * Optimize file
-     * @param thefile
+     * @param filepath
      */
-    function optimize(thefile){
+    function optimize(filepath){
         var optimized = false,
-            stream = fs.createReadStream(thefile, 'utf8'),
+            stream = fs.createReadStream(filepath, 'utf8'),
             t, patterns;
 
         stream.on('data',function(d){
@@ -92,9 +94,9 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
             }
 
             if(optimized){
-                fs.writeFile(thefile, d, { flag : 'w' }, function(err) {
+                fs.writeFile(filepath, d, { flag : 'w' }, function(err) {
                     if (err) throw err;
-                    console.log(thefile + ' has been optimized');
+                    console.log(filepath + ' has been optimized');
                 });
             }
         });
@@ -151,25 +153,25 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
      */
     function generateShorthands(uniqueVariables){
         var chars = ['',
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-            amountChars = --chars.length,
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+            amountChars = chars.length - 1,
             amountUniqueVariables = uniqueVariables.length,
-            char1 = 0, char2 = 0, i, combinations = [];
+            char1 = 0, char2 = 0, i, combinations = {};
 
         for(i=0;i<amountUniqueVariables;++i)
         {
             if (char2 === amountChars) {
                 ++char1;
-                char2 = 0;
+                char2 = 1;
             } else {
                 ++char2;
             }
 
-            combinations[ chars[char1] + chars[char2] ] = uniqueVariables[i];
+            combinations[chars[char1] + chars[char2]] = uniqueVariables[i];
         }
 
         return combinations;
@@ -191,5 +193,7 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
             this.push(element);
         }
     };
+
+
 }
 
