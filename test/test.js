@@ -17,7 +17,7 @@ describe('gulp-translatify', function() {
 			.pipe(translatify(translationFiles))
 			.pipe(through.obj(function(file, encoding, callback){
 				var expected = fs.readFileSync(filenameOut);
-				expect(expected.toString()).to.be.equal(file.contents.toString());
+				expect(file.contents.toString()).to.be.equal(expected.toString());
 				done();
 			}));
 	});

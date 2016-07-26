@@ -79,8 +79,8 @@ function Translatify(translationFiles){
     function generateReplacementPatterns(search, replace){
         return [                                                    // Example usage
             ["\'" + search + "\'", "'" + replace + "'"],              // 'VARIABLENAME' | translate
-            ["\," + search + "\:", "," + replace + ":"],              //
-            //["\'" + search + "\\", "'" + replace + "\\"],           //
+            ["\," + search + "\:", "," + replace + ":"],              // ,INFOPAGE_PRIVACYPOLICY_TITLE:"
+            //["\'" + search + "\'", "\'" + replace + "\'"],           // {{::\'STOMT_FROM_GIPHY_CAPS\'| translate}}
             ["\>" + search + "\<", ">" + replace + "<"],              // <span translate>VARIABLENAME</span>
             ["translation\." + search , "translation." + replace],    // var stomtBecause = translation.STOMT_BECAUSE;
         ];
