@@ -6,6 +6,7 @@ var u = require('underscore'),
 // Rules
 // 1. Only run this script with minified (removed whitespaces) files
 // 2. Extend "generateReplacementPatterns"-function if necessary
+// 3. Use at least 3 chars long translation variable and starts with an alphabetic character
 
 var translationsFiles = [
     'app/components/_lang/lang-de.js',
@@ -31,9 +32,21 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
     var notReplaced = [],   // translation variables that haven't been replaced
         replaced = [],      // translation variables that have been replaced
         variables = getVariablesFromTranslationFiles(translationsFiles),
+        variables = variables.filter(onlyUseSecureVariables),
         variableShorthandCombinations = generateShorthands(variables);      // Generate shorthands combinations
 
-    //console.log(variableShorthandCombinations);
+    function onlyUseSecureVariables(variable){
+        // At least 3 chars long
+        if(variable.length < 3){
+            return false;
+        }
+        // Does not start with num
+        if (variable[0].match(/^[a-zA-Z]/) == null) {
+            return false;
+        }
+
+        return true;
+    }
 
     // Walk through files and replace old translation-variables with new onces
     u.each(pathsToOptimize, function(optimizePath, variableShorthandCombinations){
@@ -52,11 +65,12 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
      * @returns {*[]}
      */
     function generateReplacementPatterns(search, replace){
-        return [                                        // Example usage
-            ["'" + search + "'", "'" + replace + "'"],    // 'VARIABLENAME' | translate
-            ["," + search + ":", "," + replace + ":"],    //
-            ["'" + search + "\\", "'" + replace + "\\"],  //
-            [">" + search + "<", ">" + replace + "<"],    // <span translate>VARIABLENAME</span>
+        return [                                                    // Example usage
+            ["\'" + search + "\'", "'" + replace + "'"],              // 'VARIABLENAME' | translate
+            ["\," + search + "\:", "," + replace + ":"],              //
+            //["\'" + search + "\\", "'" + replace + "\\"],           //
+            ["\>" + search + "\<", ">" + replace + "<"],              // <span translate>VARIABLENAME</span>
+            ["translation\." + search , "translation." + replace],    // var stomtBecause = translation.STOMT_BECAUSE;
         ];
     }
 
@@ -67,9 +81,10 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
     function optimize(filepath){
         var optimized = false,
             stream = fs.createReadStream(filepath, 'utf8'),
-            t, patterns;
+            t, patterns, re;
 
         stream.on('data',function(d){
+
             // Walk through all variabes to check if something has to be replaced
             for (var key in variableShorthandCombinations) {
                 // Check if key really exists
@@ -81,7 +96,9 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
 
                         for(var pk in patterns){
                             if(Array.isArray(patterns[pk])){
-                                t = d.split(patterns[pk][0]).join(patterns[pk][1]);
+                                re = new RegExp(patterns[pk][0], 'g');
+                                t = d.replace(re, patterns[pk][1]);
+                                //t = d.split(patterns[pk][0]).join(patterns[pk][1]);
                                 if(d != t){
                                     d = t;
                                     optimized = true;
@@ -147,7 +164,7 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
 
     /**
      * Create array with shorhandltes as array-keys
-     * Allows 62! combinations
+     * Allows 52^2 = 2704 combinations
      * @param uniqueVariables
      * @returns {Array}
      */
@@ -156,8 +173,7 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
                 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
             amountChars = chars.length - 1,
             amountUniqueVariables = uniqueVariables.length,
             char1 = 0, char2 = 0, i, combinations = {};
@@ -196,4 +212,3 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
 
 
 }
-
