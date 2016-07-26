@@ -1,5 +1,6 @@
 var through = require('through2');
 var gutil = require('gulp-util');
+var Translatify = require('./translatify.js');
 var PluginError = gutil.PluginError;
 
 // consts
@@ -12,7 +13,7 @@ function gulpTranslatify(translationFiles) {
   }
 
   // init translatify
-  // TODO init translatify
+  var translatify = new Translatify(translationFiles);
 
   // creating a stream through which each file will pass
   var stream = through.obj(function(file, enc, cb) {
@@ -22,7 +23,7 @@ function gulpTranslatify(translationFiles) {
     }
 
     if (file.isBuffer()) {
-      var parsed = file.contents; // TODO execute translatify
+      var parsed = translatify.optimize(file.contents);
       file.contents = new Buffer(parsed);
     }
 

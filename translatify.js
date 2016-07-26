@@ -2,16 +2,16 @@ var u = require('underscore'),
     fs = require('fs');
 
 // Test
-var translationFiles = [
-    'app/components/_lang/lang-de.js',
-    'app/components/_lang/lang-en.js'
-];
-
-var fileContent = "$translate(['STOMT_BECAUSE', 'STOMT_WOULD']).then(function(translation) {stomtBecause = translation.STOMT_BECAUSE;stomtWould = translation.STOMT_WOULD;replaceText = ['', stomtWould, stomtWould + ' ', stomtWould + '&nbsp;', stomtBecause, stomtBecause + ' ', stomtBecause + '&nbsp;'];});";
-
-translatify = new Translatify(translationFiles);
-
-console.log(translatify.optimize(fileContent));
+// var translationFiles = [
+//     'app/components/_lang/lang-de.js',
+//     'app/components/_lang/lang-en.js'
+// ];
+//
+// var fileContent = "$translate(['STOMT_BECAUSE', 'STOMT_WOULD']).then(function(translation) {stomtBecause = translation.STOMT_BECAUSE;stomtWould = translation.STOMT_WOULD;replaceText = ['', stomtWould, stomtWould + ' ', stomtWould + '&nbsp;', stomtBecause, stomtBecause + ' ', stomtBecause + '&nbsp;'];});";
+//
+// translatify = new Translatify(translationFiles);
+//
+// console.log(translatify.optimize(fileContent));
 
 
 /**
@@ -171,3 +171,6 @@ function Translatify(translationFiles){
     }
 
 }
+
+// exporting the plugin
+module.exports = Translatify;
