@@ -3,12 +3,23 @@
   "version": "1.0.0",
   "description": "Replaces long descriptive translation variables with shortcodes",
   "main": "index.js",
+  "dependencies": {
+    "fs": "0.0.2",
+    "underscore": "^1.8.3",
+    "through2": "^2.0.1",
+    "gulp-util": "^3.0.7"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "mocha": "^2.5.3"
+  },
   "scripts": {
-    "test": "translatify"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "gulp-translatify"
+    "url": "git://github.com:stomt/gulp-translatify.git"
   },
   "keywords": [
     "gulp",
@@ -19,13 +30,9 @@
     "reduce",
     "filesize"
   ],
-  "author": "Philipp Zentner",
-  "license": "ISC",
-  "dependencies": {
-    "fs": "0.0.2",
-    "underscore": "^1.8.3"
-  },
-  "devDependencies": {
-    "gulp": "^3.9.1"
-  }
+  "contributors": [
+    "Philipp Zentner <philipp.zentner@stomt.com>",
+    "Max Klenk <max@klenk.biz>"
+  ],
+  "license": "MIT"
 }
