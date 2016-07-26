@@ -1,0 +1,1 @@
+$translate(['a', 'b']).then(function(translation) {stomtBecause = translation.a;stomtWould = translation.b;replaceText = ['', stomtWould, stomtWould + ' ', stomtWould + '&nbsp;', stomtBecause, stomtBecause + ' ', stomtBecause + '&nbsp;'];});

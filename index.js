@@ -23,7 +23,7 @@ function gulpTranslatify(translationFiles) {
     }
 
     if (file.isBuffer()) {
-      var parsed = translatify.optimize(file.contents);
+      var parsed = translatify.optimize(file.contents.toString());
       file.contents = new Buffer(parsed);
     }
 
