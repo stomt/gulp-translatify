@@ -1,57 +1,69 @@
 var u = require('underscore'),
-    fs = require('fs'),
-    walk = require('fs-walk'),
-    path = require('path');
+    fs = require('fs');
 
-// Rules
-// 1. Only run this script with minified (removed whitespaces) files
-// 2. Extend "generateReplacementPatterns"-function if necessary
-// 3. Use at least 3 chars long translation variable and starts with an alphabetic character
-
-var translationsFiles = [
+// Test
+var translationFiles = [
     'app/components/_lang/lang-de.js',
     'app/components/_lang/lang-en.js'
 ];
 
-// Add local paths or URL
-var pathsToOptimize = [
-    'dist',
-    //'https://cdn.stomt.com/js/scripts-da322ebc3f.js'
-];
+var fileContent = "$translate(['STOMT_BECAUSE', 'STOMT_WOULD']).then(function(translation) {stomtBecause = translation.STOMT_BECAUSE;stomtWould = translation.STOMT_WOULD;replaceText = ['', stomtWould, stomtWould + ' ', stomtWould + '&nbsp;', stomtBecause, stomtBecause + ' ', stomtBecause + '&nbsp;'];});";
 
-var supportedExtensions = [
-    '.js',
-    '.html',
-    '.map'
-];
+translatify = new Translatify(translationFiles);
 
-translatify(translationsFiles, pathsToOptimize, supportedExtensions);
+console.log(translatify.optimize(fileContent));
 
-function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
 
-    var notReplaced = [],   // translation variables that haven't been replaced
-        replaced = [],      // translation variables that have been replaced
-        variables = getVariablesFromTranslationFiles(translationsFiles),
-        variables = variables.filter(onlyUseSecureVariables),
-        variableShorthandCombinations = generateShorthands(variables);      // Generate shorthands combinations
+/**
+ * translatify.optimize(fileContent) with optimized translationFiles
+ * 1. Only run this script with minified (removed whitespaces) files
+ * 2. Extend "generateReplacementPatterns"-function if necessary
+ * 3. Use at least 3 chars long translation variable and starts with an alphabetic character
+ * @param translationFiles
+ * @constructor
+ */
+function Translatify(translationFiles){
 
-    function onlyUseSecureVariables(variable){
-        // At least 3 chars long
-        if(variable.length < 3){
-            return false;
+    var optimizedVariables = getOptimizedVariables(translationFiles);
+
+    /**
+     * Optimize fileContent
+     * @param fileContent
+     */
+    this.optimize = function(fileContent){
+        var optimized = false, t, patterns, re;
+        // Walk through all variabes to check if something has to be replaced
+        for (var key in optimizedVariables) {
+            // Check if key really exists
+            if (optimizedVariables.hasOwnProperty(key)) {
+                // Check if variable is present
+                if( (fileContent.split(optimizedVariables[key]).length - 1) > 0 ) {
+                    // Generate project specific patterns
+                    patterns = generateReplacementPatterns( optimizedVariables[key], key);
+
+                    for(var pk in patterns){
+                        if(Array.isArray(patterns[pk])){
+
+                            re = new RegExp(patterns[pk][0], 'g');
+                            t = fileContent.replace(re, patterns[pk][1]);
+
+                            // Check if file was optimized
+                            if(fileContent != t){
+                                fileContent = t;
+                                optimized = true;
+                            }
+                        }
+                    }
+                }
+            }
         }
-        // Does not start with num
-        if (variable[0].match(/^[a-zA-Z]/) == null) {
-            return false;
+
+        if(optimized){
+            console.log('File has been optimized');
         }
 
-        return true;
+        return fileContent;
     }
-
-    // Walk through files and replace old translation-variables with new onces
-    u.each(pathsToOptimize, function(optimizePath, variableShorthandCombinations){
-        walkThroughDirectory(optimizePath, variableShorthandCombinations)
-    });
 
     /**
      * Generate replacement patterns
@@ -74,70 +86,15 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
         ];
     }
 
-    /**
-     * Optimize file
-     * @param filepath
-     */
-    function optimize(filepath){
-        var optimized = false,
-            stream = fs.createReadStream(filepath, 'utf8'),
-            t, patterns, re;
-
-        stream.on('data',function(d){
-
-            // Walk through all variabes to check if something has to be replaced
-            for (var key in variableShorthandCombinations) {
-                // Check if key really exists
-                if (variableShorthandCombinations.hasOwnProperty(key)) {
-                    // Check if variable is present
-                    if( (d.split(variableShorthandCombinations[key]).length - 1) > 0 ) {
-                        // Generate project specific patterns
-                        patterns = generateReplacementPatterns( variableShorthandCombinations[key], key);
-
-                        for(var pk in patterns){
-                            if(Array.isArray(patterns[pk])){
-                                re = new RegExp(patterns[pk][0], 'g');
-                                t = d.replace(re, patterns[pk][1]);
-                                //t = d.split(patterns[pk][0]).join(patterns[pk][1]);
-                                if(d != t){
-                                    d = t;
-                                    optimized = true;
-                                    replaced.push(variableShorthandCombinations[key]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(optimized){
-                fs.writeFile(filepath, d, { flag : 'w' }, function(err) {
-                    if (err) throw err;
-                    console.log(filepath + ' has been optimized');
-                });
-            }
-        });
-        stream.on('error',function(err){
-            console.log("Error 2" + err);
-        });
-    }
 
     /**
-     * Walk recursively through directory-structure
+     * Get all variables and generate shorthands
+     * @param translationFiles
+     * @returns {Array}
      */
-    function walkThroughDirectory(optimizePath){
-        walk.walk(optimizePath, function(basedir, filename, stat) {
-            var filepath = basedir+'/'+filename;
-            if(stat.isDirectory()){
-                walkThroughDirectory(filepath);
-            } else {
-                if(supportedExtensions.indexOf(path.extname(filepath)) > -1){
-                    optimize(filepath);
-                }
-            }
-        }, function(err) {
-            if (err) console.log("Error 1" + err);
-        });
+    function getOptimizedVariables(translationFiles){
+        var variables = getVariablesFromTranslationFiles(translationFiles);
+        return generateShorthands(variables);
     }
 
     /**
@@ -146,7 +103,7 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
     function getVariablesFromTranslationFiles(translationFiles){
         // Get variables from all translation-files
         var vars = [];
-        u.each(translationsFiles, function(translationFile) {
+        u.each(translationFiles, function(translationFile) {
             var translationFileString = fs.readFileSync(translationFile, 'utf8'),
                 translationVariables = translationFileString.match(/'([0-9A-Z_,.-]*?)'/g);
             vars = vars.concat(translationVariables);
@@ -159,7 +116,27 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
         vars = vars.filter(function(value, index, self){return self.indexOf(value)===index});
         // Reindex
         vars = vars.filter(function(val){return val});
+        // Filter out rules
+        vars = vars.filter(onlyUseSecureVariables);
         return vars;
+    }
+
+    /**
+     * Check if variables passes security checks
+     * @param variable
+     * @returns {boolean}
+     */
+    function onlyUseSecureVariables(variable){
+        // At least 3 chars long
+        if(variable.length < 3){
+            return false;
+        }
+        // Does not start with num
+        if (variable[0].match(/^[a-zA-Z]/) == null) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -192,23 +169,5 @@ function translatify(translationsFiles, pathsToOptimize, supportedExtensions){
 
         return combinations;
     }
-
-    // check if an element exists in array using a comparer function
-    // comparer : function(currentElement)
-    Array.prototype.inArray = function(comparer) {
-        for(var i=0; i < this.length; i++) {
-            if(comparer(this[i])) return true;
-        }
-        return false;
-    };
-
-    // adds an element to the array if it does not already exist using a comparer
-    // function
-    Array.prototype.pushIfNotExist = function(element, comparer) {
-        if (!this.inArray(comparer)) {
-            this.push(element);
-        }
-    };
-
 
 }
