@@ -6,12 +6,13 @@ var PluginError = gutil.PluginError;
 const PLUGIN_NAME = 'gulp-translatify';
 
 // plugin level function (dealing with files)
-function gulpTranslatify(prefixText) {
-  if (!prefixText) {
-    throw new PluginError(PLUGIN_NAME, 'Missing prefix text!');
+function gulpTranslatify(translationFiles) {
+  if (!translationFiles) {
+    throw new PluginError(PLUGIN_NAME, 'Missing translation files!');
   }
 
-  prefixText = new Buffer(prefixText); // allocate ahead of time
+  // init translatify
+  // TODO init translatify
 
   // creating a stream through which each file will pass
   var stream = through.obj(function(file, enc, cb) {
@@ -21,7 +22,8 @@ function gulpTranslatify(prefixText) {
     }
 
     if (file.isBuffer()) {
-      file.contents = Buffer.concat([prefixText, file.contents]);
+      var parsed = file.contents; // TODO execute translatify
+      file.contents = new Buffer(parsed);
     }
 
     // make sure the file goes through the next gulp plugin

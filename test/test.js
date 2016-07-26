@@ -7,14 +7,17 @@ var fs = require('fs');
 describe('gulp-translatify', function() {
 	var filenameIn = __dirname + '/fixture/scripts.js';
 	var filenameOut = __dirname + '/expected/scripts.js';
+	var translationFiles = [
+		__dirname + '/fixture/lang-de.js',
+		__dirname + '/fixture/lang-en.js'
+	];
 
 	it('should...', function(done) {
 		return gulp.src(filenameIn)
-			.pipe(translatify('text'))
+			.pipe(translatify(translationFiles))
 			.pipe(through.obj(function(file, encoding, callback){
-				var source = fs.readFileSync(filenameOut);
-
-				expect(source.toString()).to.be.equal(file.contents.toString());
+				var expected = fs.readFileSync(filenameOut);
+				expect(expected.toString()).to.be.equal(file.contents.toString());
 				done();
 			}));
 	});
