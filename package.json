@@ -21,6 +21,10 @@
   ],
   "author": "Philipp Zentner",
   "license": "ISC",
+  "dependencies": {
+    "fs": "0.0.2",
+    "underscore": "^1.8.3"
+  },
   "devDependencies": {
     "gulp": "^3.9.1"
   }
