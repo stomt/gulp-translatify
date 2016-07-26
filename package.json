@@ -5,19 +5,19 @@
   "main": "index.js",
   "dependencies": {
     "through2": "^2.0.1",
-    "gulp-util": "^3.0.3"
+    "gulp-util": "^3.0.7"
   },
   "devDependencies": {
-    "chai": "^2.0.0",
-    "gulp": "^3.8.8",
-    "mocha": "^2.1.0"
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "mocha": "^2.5.3"
   },
   "scripts": {
     "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "gulp-translatify"
+    "url": "git://github.com:stomt/gulp-translatify.git"
   },
   "keywords": [
     "gulp",
@@ -28,6 +28,9 @@
     "reduce",
     "filesize"
   ],
-  "author": "Philipp Zentner",
-  "license": "ISC"
+  "contributors": [
+    "Philipp Zentner <philipp.zentner@stomt.com>",
+    "Max Klenk <max@klenk.biz>"
+  ],
+  "license": "MIT"
 }
