@@ -77,15 +77,15 @@ function Translatify(translationFiles){
      * @returns {*[]}
      */
     function generateReplacementPatterns(search, replace){
-        return [                                                    // Example usage
+        return [                                                      // Example usage
             ["\'" + search + "\'", "'" + replace + "'"],              // 'VARIABLENAME' | translate
             ["\," + search + "\:", "," + replace + ":"],              // ,INFOPAGE_PRIVACYPOLICY_TITLE:"
-            //["\'" + search + "\'", "\'" + replace + "\'"],           // {{::\'STOMT_FROM_GIPHY_CAPS\'| translate}}
+            ["\,\n" + search + "\:", "," + replace + ":"],            // [new line],INFOPAGE_PRIVACYPOLICY_TITLE:"
+            ["\\\\'" + search + "\\\\'", "\\'" + replace + "\\'"],    // {{::\'STOMT_FROM_GIPHY_CAPS\'| translate}}
             ["\>" + search + "\<", ">" + replace + "<"],              // <span translate>VARIABLENAME</span>
             ["translation\." + search , "translation." + replace],    // var stomtBecause = translation.STOMT_BECAUSE;
         ];
     }
-
 
     /**
      * Get all variables and generate shorthands
