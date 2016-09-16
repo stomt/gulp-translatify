@@ -1,6 +1,6 @@
 {
   "name": "gulp-translatify",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Replaces long descriptive translation variables with shortcodes",
   "main": "index.js",
   "dependencies": {
