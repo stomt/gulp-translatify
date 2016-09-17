@@ -46,10 +46,6 @@ function Translatify(translationFiles) {
       }
     }
 
-    if (optimized) {
-      console.log('File has been optimized');
-    }
-
     return fileContent;
   };
 
@@ -65,13 +61,15 @@ function Translatify(translationFiles) {
    * @returns {*[]}
    */
   function generateReplacementPatterns(search, replace) {
-    return [                                                      // Example usage
+    return [                                                    // Example usage
       ["\'" + search + "\'", "'" + replace + "'"],              // 'VARIABLENAME' | translate
+      ["\"" + search + "\"", '"' + replace + '"'],              // ["VARIABLENAME"]
+      ["\{" + search + "\:", "{" + replace + ":"],              // {INFOPAGE_PRIVACYPOLICY_TITLE:"
       ["\," + search + "\:", "," + replace + ":"],              // ,INFOPAGE_PRIVACYPOLICY_TITLE:"
       ["\,\n" + search + "\:", "," + replace + ":"],            // [new line],INFOPAGE_PRIVACYPOLICY_TITLE:"
       ["\\\\'" + search + "\\\\'", "\\'" + replace + "\\'"],    // {{::\'STOMT_FROM_GIPHY_CAPS\'| translate}}
       ["\>" + search + "\<", ">" + replace + "<"],              // <span translate>VARIABLENAME</span>
-      ["translation\." + search, "translation." + replace],    // var stomtBecause = translation.STOMT_BECAUSE;
+      ["translation\." + search, "translation." + replace],     // var stomtBecause = translation.STOMT_BECAUSE;
     ];
   }
 
@@ -93,11 +91,11 @@ function Translatify(translationFiles) {
     var vars = [];
     u.each(translationFiles, function(translationFile) {
       var translationFileString = fs.readFileSync(translationFile, 'utf8'),
-        translationVariables = translationFileString.match(/'([0-9A-Z_,.-]*?)'/g);
+        translationVariables = translationFileString.match(/'([0-9A-Z_,.-]*?)':/g);
       vars = vars.concat(translationVariables);
     });
-    // Remove enclosing single-quotes
-    vars = JSON.parse(JSON.stringify(vars).replace(/\'/g, ''));
+    // Remove enclosing single-quotes and the double point
+    vars = JSON.parse(JSON.stringify(vars).replace(/\'/g, '').replace(/\:/g, ''));
     // Flatten array
     vars = u.flatten(vars);
     // Only uniques
